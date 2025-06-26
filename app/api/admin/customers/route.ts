@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 在事务中创建用户和客户资料
-    const newUser = await prisma.$transaction(async (tx: PrismaClient) => {
+    const newUser = await prisma.$transaction(async (tx) => {
       // 创建用户
       const user = await tx.user.create({
         data: {
