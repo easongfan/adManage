@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic'; // 强制 API 路由不使用缓存
 import { getAuthUser } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
