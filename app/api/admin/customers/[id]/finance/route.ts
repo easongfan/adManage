@@ -104,7 +104,7 @@ export async function POST(
     const actualAmount = type === 'recharge' ? amount : -amount;
 
     // 在事务中创建交易记录并更新余额
-    const result = await prisma.$transaction(async (tx: PrismaClient) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 创建交易记录
       const transaction = await tx.financialTransaction.create({
         data: {
