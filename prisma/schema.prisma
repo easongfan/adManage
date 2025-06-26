@@ -1,0 +1,108 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique // 唯一的登录用户名
+  password_hash String
+  role          Role     @default(customer)
+  balance       Decimal  @default(0.00) @db.Decimal(10, 2)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  profile               CustomerProfile?
+  ads                   Ad[]
+  financialTransactions FinancialTransaction[]
+  spendLogsCreated      AdSpendLog[]
+
+  @@map("users")
+}
+
+model CustomerProfile {
+  id              Int     @id @default(autoincrement())
+  user_id         Int     @unique
+  company_name    String?
+  company_website String?
+  contact_person  String?
+  mobile_phone    String?
+  contact_qq      String?
+
+  user            User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("customer_profiles")
+}
+
+model Ad {
+  id           Int          @id @default(autoincrement())
+  customer_id  Int
+  name         String
+  status       AdStatus     @default(paused)
+  unit_price   Decimal?     @db.Decimal(10, 2)
+  billing_type String?
+  ad_format    String?
+  budget       Decimal?     @db.Decimal(10, 2)
+  platform     String?
+  created_at   DateTime     @default(now())
+
+  customer     User         @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  spendLogs    AdSpendLog[]
+
+  @@map("ads")
+}
+
+model AdSpendLog {
+  id           Int            @id @default(autoincrement())
+  ad_id        Int
+  spend_date   DateTime       @db.Date
+  amount       Decimal        @db.Decimal(10, 2)
+  platform     SpendPlatform
+  created_by   Int
+  created_at   DateTime       @default(now())
+
+  ad           Ad             @relation(fields: [ad_id], references: [id], onDelete: Cascade)
+  creator      User           @relation(fields: [created_by], references: [id], onDelete: NoAction)
+
+  @@map("ad_spend_logs")
+}
+
+model FinancialTransaction {
+  id               Int              @id @default(autoincrement())
+  customer_id      Int
+  type             TransactionType
+  amount           Decimal          @db.Decimal(10, 2)
+  status           String?
+  notes            String?          @db.Text
+  transaction_date DateTime         @default(now())
+
+  customer         User             @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+
+  @@map("financial_transactions")
+}
+
+enum Role {
+  admin
+  customer
+}
+
+enum AdStatus {
+  active
+  paused
+}
+
+enum SpendPlatform {
+  iOS
+  Android
+  WeChat
+}
+
+enum TransactionType {
+  recharge
+  deduction
+}
