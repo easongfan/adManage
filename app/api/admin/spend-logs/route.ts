@@ -49,19 +49,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 在事务中原子地扣减余额并创建消耗记录
-    const result = await prisma.$transaction(async (prismaClient: typeof prisma) => {
+    const result = await prisma.$transaction(async (prismaClient) => {
       // 扣减客户余额
       const updatedCustomer = await prismaClient.user.update({
         where: { id: customer_id },
         data: {
-          balance: (customerBalance - amount).toString(),
+          balance: customerBalance - amount,
         },
       });
 
       // 创建消耗记录
       const spendLog = await prismaClient.adSpendLog.create({
         data: {
-          amount: amount.toString(),
+          amount: amount,
           platform,
           spend_date: new Date(spend_date),
           ad: {
