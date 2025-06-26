@@ -79,7 +79,7 @@ export async function PUT(
     }
 
     // 在事务中更新客户信息
-    await prisma.$transaction(async (tx: PrismaClient) => {
+    await prisma.$transaction(async (tx) => {
       // 如果提供了新密码，则更新密码
       if (password) {
         const passwordHash = await bcrypt.hash(password, 10);
@@ -152,7 +152,7 @@ export async function DELETE(
     }
 
     // 在事务中删除客户及相关数据
-    await prisma.$transaction(async (tx: PrismaClient) => {
+    await prisma.$transaction(async (tx) => {
       // 删除客户资料
       await tx.customerProfile.delete({
         where: { user_id: customerId },
