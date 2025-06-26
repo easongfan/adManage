@@ -48,13 +48,13 @@ export async function DELETE(
     // 在事务中原子地返还余额并删除消耗记录
     const result = await prisma.$transaction(async (prismaClient) => {
       // 返还客户余额
-      const currentBalance = parseFloat(customer.balance || '0');
-      const spendAmount = parseFloat(spendLog.amount || '0');
+      const currentBalance = customer.balance ? Number(customer.balance) : 0;
+      const spendAmount = spendLog.amount ? Number(spendLog.amount) : 0;
       
       const updatedCustomer = await prismaClient.user.update({
         where: { id: customerId },
         data: {
-          balance: (currentBalance + spendAmount).toString(),
+          balance: currentBalance + spendAmount,
         },
       });
 

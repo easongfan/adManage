@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证客户余额充足
-    const customerBalance = parseFloat(customer.balance || '0');
+    const customerBalance = customer.balance ? Number(customer.balance) : 0;
     if (customerBalance < amount) {
       return NextResponse.json({ error: '客户余额不足' }, { status: 400 });
     }
